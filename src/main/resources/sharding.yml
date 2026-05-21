@@ -1,0 +1,40 @@
+dataSources:
+  shardwallet1:
+    jdbcUrl: jdbc:mysql://localhost:3306/shardwallet1
+    username: root
+    password: Nayabnj@123
+    driverClassName: com.mysql.cj.jdbc.Driver
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+
+  shardwallet2:
+    jdbcUrl: jdbc:mysql://localhost:3306/shardwallet2
+    username: root
+    password: Nayabnj@123
+    driverClassName: com.mysql.cj.jdbc.Driver
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+
+rules:
+- !SHARDING
+    defaultDatabaseStrategy:  #Default strategy for Database Sharding
+      standard:
+        shardingColumn: id
+        shardingAlgorithmName: db-inline #Inline algorithm for Database Sharding (Modulo algorithm -> eg. id % 2 = 0 -> shardwallet1, id % 2 = 1 -> shardwallet2)
+    tables:
+      user: #Doesnot automatically point to the particular table, we have to create actual data nodes in the database
+        actualDataNodes: shardwallet${1..2}.user
+        databaseStrategy:
+          standard:
+            shardingColumn: id
+            shardingAlgorithmName: db-inline #Inline algorithm for Table Sharding (Modulo algorithm -> eg. id % 2 = 0 -> user_0, id % 2 = 1 -> user_1)
+        keyGenerateStrategy:
+          column: id
+          keyGeneratorName: snowflake
+
+    shardingAlgorithms:
+      db-inline:
+        type: INLINE
+        props:
+          algorithm-expression: shardwallet${id % 2 + 1} #even -> shardwallet1, odd -> shardwallet2
+    keyGenerators:
+      snowflake:
+        type: SNOWFLAKE #Snowflake algorithm for Key Generation
