@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -17,5 +19,12 @@ public class UserService {
         User newUser =  userRepository.save(user);
         log.info("User created with ID: {} in database shardewallet{}", newUser.getId() , newUser.getId() % 2 + 1);
         return newUser;
+    }
+    public User getUserById(Long id){
+        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+    }
+
+    public List<User> searchUsersByName(String name){
+        return userRepository.findByNameContainingIgnoreCase(name);
     }
 }
