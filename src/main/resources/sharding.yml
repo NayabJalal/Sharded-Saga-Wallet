@@ -29,6 +29,42 @@ rules:
         keyGenerateStrategy:
           column: id
           keyGeneratorName: snowflake
+      wallet:
+        actualDataNodes: shardwallet${1..2}.wallet
+        databaseStrategy:
+          standard:
+            shardingColumn: id
+            shardingAlgorithmName: db-inline #Inline algorithm for Table Sharding (Modulo algorithm -> eg. id % 2 = 0 -> wallet_0, id % 2 = 1 -> wallet_1)
+        keyGenerateStrategy:
+          column: id
+          keyGeneratorName: snowflake
+      transaction:
+        actualDataNodes: shardwallet${1..2}.transaction
+        databaseStrategy:
+          standard:
+            shardingColumn: id
+            shardingAlgorithmName: db-inline #Inline algorithm for Table Sharding (Modulo algorithm -> eg. id % 2 = 0 -> transaction_0, id % 2 = 1 -> transaction_1)
+        keyGenerateStrategy:
+          column: id
+          keyGeneratorName: snowflake
+      saga_instance:
+        actualDataNodes: shardwallet${1..2}.saga_instance
+        databaseStrategy:
+          standard:
+            shardingColumn: id
+            shardingAlgorithmName: db-inline #Inline algorithm for Table Sharding (Modulo algorithm -> eg. id % 2 = 0 -> saga_instance_0, id % 2 = 1 -> saga_instance_1)
+        keyGenerateStrategy:
+          column: id
+          keyGeneratorName: snowflake
+      saga_step:
+        actualDataNodes: shardwallet${1..2}.saga_step
+        databaseStrategy:
+          standard:
+            shardingColumn: id
+            shardingAlgorithmName: db-inline #Inline algorithm for Table Sharding (Modulo algorithm -> eg. id % 2 = 0 -> saga_step_0, id % 2 = 1 -> saga_step_1)
+        keyGenerateStrategy:
+          column: id
+          keyGeneratorName: snowflake
 
     shardingAlgorithms:
       db-inline:
