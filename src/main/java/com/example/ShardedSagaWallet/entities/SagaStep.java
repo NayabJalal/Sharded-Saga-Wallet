@@ -25,12 +25,21 @@ public class SagaStep {
     @Column(name = "status", nullable = false)
     private SagaStepStatus status;
 
-    @Column(name = "error_message" , nullable = false)
-    private String errorMessage;
+    @Builder.Default
+    @Column(name = "error_message")
+    private String errorMessage = "";
 
     //json Step data
     @Column(name = "step_data", columnDefinition = "json")
     private String stepData;
+
+    @PrePersist
+    @PreUpdate
+    public void prePersistOrUpdate() {
+        if (this.errorMessage == null) {
+            this.errorMessage = "";
+        }
+    }
 
     public void markAsRunning() {
         this.status = SagaStepStatus.RUNNING;

@@ -34,8 +34,21 @@ public class SagaContext {
 
     public BigDecimal getBigDecimal(String key) {
         Object value = get(key);
+        if (value == null) {
+            return null;
+        }
         if (value instanceof BigDecimal) {
+            return (BigDecimal) value;
+        }
+        if (value instanceof Number) {
             return BigDecimal.valueOf(((Number) value).doubleValue());
+        }
+        if (value instanceof String) {
+            try {
+                return new BigDecimal((String) value);
+            } catch (NumberFormatException ex) {
+                return null;
+            }
         }
         return null;
     }

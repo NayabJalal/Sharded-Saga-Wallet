@@ -36,8 +36,7 @@ public class CreditDestinationWalletStep implements SagaStepInterface {
 
         //Step 3: Credit the specified amount to the destination wallet
 
-        wallet.credit(amount);
-        walletRepository.save(wallet);
+        walletRepository.updateBalanceByUserId(toWalletId, wallet.getBalance().add(amount));
         log.info("Wallet saved with new balance: {}", wallet.getBalance());
         context.put("toWalletBalanceAfterCredit", wallet.getBalance());
 
@@ -54,8 +53,7 @@ public class CreditDestinationWalletStep implements SagaStepInterface {
         Wallet wallet = walletRepository.findByIdWithLock(toWalletId)
                 .orElseThrow(() -> new IllegalArgumentException("Destination wallet not found with id: " + toWalletId));
         log.info("Wallet fetched with balance: {}", wallet.getBalance());
-        wallet.debit(amount);
-        walletRepository.save(wallet);
+        walletRepository.updateBalanceByUserId(toWalletId, wallet.getBalance().subtract(amount));
         log.info("Wallet saved with balance: {}", wallet.getBalance());
         context.put("toWalletBalanceAfterCreditCompensation", wallet.getBalance());
         log.info("Credit compensation of destination wallet step executed successfully");

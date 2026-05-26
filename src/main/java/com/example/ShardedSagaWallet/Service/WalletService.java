@@ -37,22 +37,31 @@ public class WalletService {
     public List<Wallet> getWalletsByUserId(Long userId){
         return walletRepository.findByUserId(userId);
     }
+    public Wallet getWalletByUserId(Long userId){
+        log.info("Getting wallet for user with id: {}", userId);
+        return walletRepository.findByUserId(userId).get(0);
+    }
 
     @Transactional
-    public void debit(Long walletId, BigDecimal amount){
-        log.info("Debiting amount {} from wallet with id: {}", amount, walletId);
-        Wallet wallet = getWalletById(walletId);
-        wallet.debit(amount);
-        walletRepository.save(wallet);
-        log.info("Debited amount {} from wallet with id: {}", amount, walletId);
+    public Wallet debit(Long userId, BigDecimal amount){
+        log.info("Debiting amount {} from wallet with id: {}", amount, userId);
+        Wallet wallet = getWalletByUserId(userId);
+        wallet.setBalance(wallet.getBalance().subtract(amount));
+
+        Wallet saved = walletRepository.save(wallet);
+        log.info("Debited successfully. Wallet ID: {} -> New Balance: {}", saved.getId(), saved.getBalance());
+        return saved;
     }
+
     @Transactional
-    public void credit(Long walletId, BigDecimal amount) {
-        log.info("Crediting amount {} to wallet with id: {}", amount, walletId);
-        Wallet wallet = getWalletById(walletId);
-        wallet.credit(amount);
-        walletRepository.save(wallet);
-        log.info("Credited amount {} to wallet with id: {}", amount, walletId);
+    public Wallet credit(Long userId, BigDecimal amount) {
+        log.info("Crediting amount {} to wallet with id: {}", amount, userId);
+        Wallet wallet = getWalletByUserId(userId);
+        wallet.setBalance(wallet.getBalance().add(amount));
+
+        Wallet saved = walletRepository.save(wallet);
+        log.info("Credited successfully. Wallet ID: {} -> New Balance: {}", saved.getId(), saved.getBalance());
+        return saved;
     }
     public BigDecimal getWalletBalance(Long walletId) {
         log.info("Getting balance for wallet with id: {}", walletId);

@@ -29,15 +29,15 @@ public class Transaction {
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
-    @Column(name = "status", nullable = false)
+    @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private TransactionStatus status = TransactionStatus.PENDING;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "transaction_type", nullable = false)
+    @Column(name = "transaction_type")
     private TransactionType transactionalType = TransactionType.TRANSFER;
 
-    @Column(name = "description" , nullable = false)
+    @Column(name = "description")
     private String description;
 
     @Column(name = "saga_instance_id")
