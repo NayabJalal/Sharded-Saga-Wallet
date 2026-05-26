@@ -1,8 +1,9 @@
 package com.example.ShardedSagaWallet.Service.saga.steps;
 
 import com.example.ShardedSagaWallet.Service.saga.SagaContext;
-import com.example.ShardedSagaWallet.Service.saga.SagaStep;
+import com.example.ShardedSagaWallet.Service.saga.SagaStepInterface;
 import com.example.ShardedSagaWallet.entities.Wallet;
+import com.example.ShardedSagaWallet.Service.saga.steps.SagaStepFactory.SagaStepType;
 import com.example.ShardedSagaWallet.repository.WalletRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ import java.math.BigDecimal;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CreditDestinationWalletStep implements SagaStep {
+public class CreditDestinationWalletStep implements SagaStepInterface {
 
     private final WalletRepository walletRepository;
 
@@ -63,6 +64,6 @@ public class CreditDestinationWalletStep implements SagaStep {
 
     @Override
     public String getStepName() {
-        return "CreditDestinationWalletStep";
+        return SagaStepType.CREDIT_DESTINATION_WALLET_STEP.toString();
     }
 }

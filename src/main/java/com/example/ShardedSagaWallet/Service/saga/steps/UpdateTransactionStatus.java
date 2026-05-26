@@ -1,8 +1,9 @@
 package com.example.ShardedSagaWallet.Service.saga.steps;
 
 import com.example.ShardedSagaWallet.Service.saga.SagaContext;
-import com.example.ShardedSagaWallet.Service.saga.SagaStep;
+import com.example.ShardedSagaWallet.Service.saga.SagaStepInterface;
 import com.example.ShardedSagaWallet.entities.Transaction;
+import com.example.ShardedSagaWallet.Service.saga.steps.SagaStepFactory.SagaStepType;
 import com.example.ShardedSagaWallet.entities.TransactionStatus;
 import com.example.ShardedSagaWallet.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UpdateTransactionStatus implements SagaStep {
+public class UpdateTransactionStatus implements SagaStepInterface {
     private final TransactionRepository transactionRepository;
     @Override
     public boolean execute(SagaContext context) {
@@ -52,6 +53,6 @@ public class UpdateTransactionStatus implements SagaStep {
 
     @Override
     public String getStepName() {
-        return "UpdateTransactionStatus";
+        return SagaStepType.UPDATE_TRANSACTION_STATUS_STEP.toString();
     }
 }

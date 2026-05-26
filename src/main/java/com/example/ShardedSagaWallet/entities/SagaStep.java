@@ -1,12 +1,14 @@
 package com.example.ShardedSagaWallet.entities;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @NoArgsConstructor
+@Builder
 @AllArgsConstructor
 @Table(name = "saga_step")
 public class SagaStep {
