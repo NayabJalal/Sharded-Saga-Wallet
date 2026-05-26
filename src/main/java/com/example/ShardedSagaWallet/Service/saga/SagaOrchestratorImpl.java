@@ -188,7 +188,8 @@ public class SagaOrchestratorImpl implements SagaOrchestrator{
                 .orElseThrow(() -> new IllegalArgumentException("Saga instance not found with id: " + sagaInstanceId));
         sagaInstance.markAsFailed();
         sagaInstanceRepository.save(sagaInstance);
-        log.info("Saga instance with id: {} marked as FAILED", sagaInstanceId);
+        compensateSaga(sagaInstanceId);
+        log.info("Saga {} failed", sagaInstanceId);
     }
 
     @Override
