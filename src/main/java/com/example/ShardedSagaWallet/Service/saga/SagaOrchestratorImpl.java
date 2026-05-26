@@ -98,6 +98,7 @@ public class SagaOrchestratorImpl implements SagaOrchestrator{
     }
 
     @Override
+    @Transactional
     public boolean compensateStep(Long sagaInstanceId, String stepName) {
         //1. Fetch the saga instance from db using the sagaInstanceId
         //2. Fetch the saga step from db using the sagaInstanceId and stepName
@@ -154,6 +155,7 @@ public class SagaOrchestratorImpl implements SagaOrchestrator{
     }
 
     @Override
+    @Transactional
     public void compensateSaga(Long sagaInstanceId) {
         SagaInstance sagaInstance = sagaInstanceRepository.findById(sagaInstanceId)
                 .orElseThrow(() -> new IllegalArgumentException("Saga instance not found with id: " + sagaInstanceId));
@@ -180,6 +182,7 @@ public class SagaOrchestratorImpl implements SagaOrchestrator{
     }
 
     @Override
+    @Transactional
     public void failSaga(Long sagaInstanceId) {
         SagaInstance sagaInstance = sagaInstanceRepository.findById(sagaInstanceId)
                 .orElseThrow(() -> new IllegalArgumentException("Saga instance not found with id: " + sagaInstanceId));
@@ -189,6 +192,7 @@ public class SagaOrchestratorImpl implements SagaOrchestrator{
     }
 
     @Override
+    @Transactional
     public void completeSaga(Long sagaInstanceId) {
         SagaInstance sagaInstance = sagaInstanceRepository.findById(sagaInstanceId)
                 .orElseThrow(() -> new IllegalArgumentException("Saga instance not found with id: " + sagaInstanceId));
