@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class UpdateTransactionStatus implements SagaStepInterface {
+
     private final TransactionRepository transactionRepository;
+
     @Override
     public boolean execute(SagaContext context) {
         Long transactionId = context.getLong("transactionId");
