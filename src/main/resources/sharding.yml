@@ -1,20 +1,20 @@
 dataSources:
   shardwallet1:
-    jdbcUrl: jdbc:mysql://localhost:3306/shardwallet1
+    jdbcUrl: jdbc:mysql://localhost:3306/shardwallet1?allowPublicKeyRetrieval=true&useSSL=false
     username: root
     password: Nayabnj@123
     driverClassName: com.mysql.cj.jdbc.Driver
     dataSourceClassName: com.zaxxer.hikari.HikariDataSource
 
   shardwallet2:
-    jdbcUrl: jdbc:mysql://localhost:3306/shardwallet2
+    jdbcUrl: jdbc:mysql://localhost:3306/shardwallet2?allowPublicKeyRetrieval=true&useSSL=false
     username: root
     password: Nayabnj@123
     driverClassName: com.mysql.cj.jdbc.Driver
     dataSourceClassName: com.zaxxer.hikari.HikariDataSource
 
 rules:
-- !SHARDING
+  - !SHARDING
     defaultDatabaseStrategy:  #Default strategy for Database Sharding
       standard:
         shardingColumn: id
