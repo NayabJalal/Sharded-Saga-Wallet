@@ -17,9 +17,11 @@ public class SagaContext {
     public SagaContext(Map<String, Object> data) {
         this.data = data != null ? data : new HashMap<>();
     }
+
     public void put(String key, Object value) {
         data.put(key, value);
     }
+
     public Object get(String key) {
         return data.get(key);
     }
@@ -28,6 +30,11 @@ public class SagaContext {
         Object value = get(key);
         if (value instanceof Number) {
             return ((Number) value).longValue();
+        }
+        if (value instanceof String) {
+            try {
+                return Long.parseLong((String) value);
+            } catch (NumberFormatException ignored) {}
         }
         return null;
     }
@@ -55,9 +62,6 @@ public class SagaContext {
 
     public String getString(String key) {
         Object value = get(key);
-        if (value instanceof String) {
-            return (String) value;
-        }
-        return null;
+        return value != null ? value.toString() : null;
     }
 }

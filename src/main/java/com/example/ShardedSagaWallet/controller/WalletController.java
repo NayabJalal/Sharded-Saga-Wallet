@@ -24,7 +24,7 @@ public class WalletController {
     @PostMapping
     public ResponseEntity<Wallet> createWallet(@RequestBody CreateWalletRequestDTO request){
         try {
-            Wallet newWallet = walletService.creaateWallet(request.getUserId());
+            Wallet newWallet = walletService.createWallet(request.getUserId());
             return ResponseEntity.status(HttpStatus.CREATED).body(newWallet);
         }catch (Exception e){
             log.error("Error creating wallet for user {}: {}", request.getUserId(), e.getMessage());

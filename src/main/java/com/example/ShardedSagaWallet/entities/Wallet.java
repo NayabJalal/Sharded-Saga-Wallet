@@ -1,5 +1,6 @@
 package com.example.ShardedSagaWallet.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
 public class Wallet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonProperty("walletId")
     private Long id;
 
     @Column(name = "user_id", nullable = false ,updatable = false)
@@ -39,6 +41,9 @@ public class Wallet {
         balance = balance.subtract(amount);
     }
     public void credit(BigDecimal amount) {
+        if (balance == null) {
+            balance = BigDecimal.ZERO;
+        }
         balance = balance.add(amount);
     }
 }

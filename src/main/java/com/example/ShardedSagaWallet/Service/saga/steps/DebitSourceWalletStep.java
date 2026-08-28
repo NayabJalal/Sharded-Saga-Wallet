@@ -2,17 +2,17 @@ package com.example.ShardedSagaWallet.Service.saga.steps;
 
 import com.example.ShardedSagaWallet.Service.saga.SagaContext;
 import com.example.ShardedSagaWallet.Service.saga.SagaStepInterface;
-import com.example.ShardedSagaWallet.entities.Wallet;
 import com.example.ShardedSagaWallet.Service.saga.steps.SagaStepFactory.SagaStepType;
+import com.example.ShardedSagaWallet.entities.Wallet;
 import com.example.ShardedSagaWallet.repository.WalletRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
-@Service
+@Service("DEBIT_SOURCE_WALLET_STEP")
 @RequiredArgsConstructor
 @Slf4j
 public class DebitSourceWalletStep implements SagaStepInterface {
@@ -30,14 +30,13 @@ public class DebitSourceWalletStep implements SagaStepInterface {
         Wallet wallet = walletRepository.findByIdWithLock(fromWalletId)
                 .orElseThrow(() -> new IllegalArgumentException("Source wallet not found with id: " + fromWalletId));
 
-        log.info("Wallet fetched with balance: {}", wallet.getBalance());
         context.put("originalSourceWalletBalance", wallet.getBalance());
 
-        walletRepository.updateBalanceByUserId(fromWalletId, wallet.getBalance().subtract(amount));
+        wallet.debit(amount);
+        walletRepository.save(wallet);
 
         log.info("Wallet saved with new balance: {}", wallet.getBalance());
         context.put("sourceWalletBalanceAfterDebit", wallet.getBalance());
-        log.info("Debit source wallet step executed successfully");
 
         return true;
     }
@@ -52,15 +51,10 @@ public class DebitSourceWalletStep implements SagaStepInterface {
         Wallet wallet = walletRepository.findByIdWithLock(fromWalletId)
                 .orElseThrow(() -> new IllegalArgumentException("Source wallet not found with id: " + fromWalletId));
 
-        log.info("Source wallet fetched with balance: {}", wallet.getBalance());
-        context.put("sourceWalletBalanceBeforeCreditCompensation", wallet.getBalance());
+        wallet.credit(amount);
+        walletRepository.save(wallet);
 
-        walletRepository.updateBalanceByUserId(fromWalletId, wallet.getBalance().add(amount));
-
-        log.info("Source wallet saved with balance: {}", wallet.getBalance());
-        context.put("sourceWalletBalanceAfterCreditCompensation", wallet.getBalance());
-        log.info("Compensating source wallet step executed successfully");
-
+        log.info("Source wallet balance restored to: {}", wallet.getBalance());
         return true;
     }
 

@@ -22,29 +22,31 @@ public class WalletService {
     private final WalletRepository walletRepository;
     private final RedissonClient redissonClient;
 
-    public Wallet creaateWallet(Long userId){
+    public Wallet createWallet(Long userId) {
         log.info("Creating wallet for user with id: {}", userId);
         Wallet wallet = Wallet.builder()
                 .userId(userId)
                 .isActive(true)
                 .balance(BigDecimal.ZERO)
                 .build();
-        wallet =  walletRepository.save(wallet);
-        log.info("Wallet created with id: {} ", wallet.getId());
+        wallet = walletRepository.save(wallet);
+        log.info("Wallet created with id: {}", wallet.getId());
         return wallet;
     }
 
-    public Wallet getWalletById(Long walletId){
+    public Wallet getWalletById(Long walletId) {
         return walletRepository.findById(walletId)
                 .orElseThrow(() -> new RuntimeException("Wallet not found with id: " + walletId));
     }
 
-    public List<Wallet> getWalletsByUserId(Long userId){
+    public List<Wallet> getWalletsByUserId(Long userId) {
         return walletRepository.findByUserId(userId);
     }
-    public Wallet getWalletByUserId(Long userId){
+
+    public Wallet getWalletByUserId(Long userId) {
         log.info("Getting wallet for user with id: {}", userId);
-        return walletRepository.findByUserId(userId).get(0);
+        return walletRepository.findFirstByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Wallet not found for user id: " + userId));
     }
 
     @Transactional
@@ -52,12 +54,8 @@ public class WalletService {
         String lockKey = "lock:wallet:user:" + userId;
         return executeWithLock(lockKey, () -> {
             log.info("Debiting amount {} from wallet with user id: {}", amount, userId);
-            try { Thread.sleep(5000); } catch (InterruptedException ignored) {}
             Wallet wallet = getWalletByUserId(userId);
-            if (wallet.getBalance().compareTo(amount) < 0) {
-                throw new IllegalStateException("Insufficient funds for user id: " + userId);
-            }
-            wallet.setBalance(wallet.getBalance().subtract(amount));
+            wallet.debit(amount);
             Wallet saved = walletRepository.save(wallet);
             log.info("Debited successfully. Wallet ID: {} -> New Balance: {}", saved.getId(), saved.getBalance());
             return saved;
@@ -70,15 +68,16 @@ public class WalletService {
         return executeWithLock(lockKey, () -> {
             log.info("Crediting amount {} to wallet with user id: {}", amount, userId);
             Wallet wallet = getWalletByUserId(userId);
-            wallet.setBalance(wallet.getBalance().add(amount));
+            wallet.credit(amount);
             Wallet saved = walletRepository.save(wallet);
             log.info("Credited successfully. Wallet ID: {} -> New Balance: {}", saved.getId(), saved.getBalance());
             return saved;
         });
     }
+
     public BigDecimal getWalletBalance(Long walletId) {
         log.info("Getting balance for wallet with id: {}", walletId);
-        BigDecimal balance =  getWalletById(walletId).getBalance();
+        BigDecimal balance = getWalletById(walletId).getBalance();
         log.info("Balance for wallet with id: {} is {}", walletId, balance);
         return balance;
     }
