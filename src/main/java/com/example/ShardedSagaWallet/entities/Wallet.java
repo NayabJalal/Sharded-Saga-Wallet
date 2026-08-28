@@ -1,5 +1,6 @@
 package com.example.ShardedSagaWallet.entities;
 
+import com.example.ShardedSagaWallet.exception.InsufficientBalanceException;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -36,8 +37,7 @@ public class Wallet {
 
     public void debit(BigDecimal amount) {
         if (!hassufficientBalance(amount)) {
-            throw new IllegalArgumentException("Insufficient balance in wallet with id: " + id);
-        }
+            throw new InsufficientBalanceException(id, amount);        }
         balance = balance.subtract(amount);
     }
     public void credit(BigDecimal amount) {

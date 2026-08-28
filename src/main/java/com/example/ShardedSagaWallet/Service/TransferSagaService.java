@@ -5,6 +5,7 @@ import com.example.ShardedSagaWallet.Service.saga.SagaOrchestrator;
 import com.example.ShardedSagaWallet.Service.saga.steps.SagaStepFactory;
 import com.example.ShardedSagaWallet.Service.saga.steps.SagaStepFactory.SagaStepType;
 import com.example.ShardedSagaWallet.entities.Transaction;
+import com.example.ShardedSagaWallet.exception.SagaExecutionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,23 +49,25 @@ public class TransferSagaService {
         return sagaInstanceId;
 
     }
-    public void executeTransferSaga(Long sagaInstanceId){
+    public void executeTransferSaga(Long sagaInstanceId) {
         log.info("Executing transfer saga with id {}", sagaInstanceId);
-
-        try{
-            for(SagaStepType step : SagaStepFactory.TransferMoneySagaSteps){
+        try {
+            for (SagaStepType step : SagaStepFactory.TransferMoneySagaSteps) {
                 boolean success = sagaOrchestrator.executeStep(sagaInstanceId, step.toString());
-                if (!success){
+                if (!success) {
                     log.error("Saga step {} failed for saga instance id {}", step, sagaInstanceId);
-                    sagaOrchestrator.failSaga(sagaInstanceId);
-                    return;
+                    throw new SagaExecutionException(sagaInstanceId, "Failed at step: " + step);
                 }
             }
-                sagaOrchestrator.completeSaga(sagaInstanceId);
-                log.info("Transfer saga with id {} completed successfully", sagaInstanceId);
-        }catch (Exception e){
-            log.error("Error executing transfer saga with id {}", sagaInstanceId, e);
+            sagaOrchestrator.completeSaga(sagaInstanceId);
+            log.info("Transfer saga with id {} completed successfully", sagaInstanceId);
+        } catch (SagaExecutionException e) {
             sagaOrchestrator.failSaga(sagaInstanceId);
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error executing transfer saga with id {}", sagaInstanceId, e);
+            sagaOrchestrator.failSaga(sagaInstanceId);
+            throw new SagaExecutionException(sagaInstanceId, "Unexpected failure: " + e.getMessage());
         }
     }
 }

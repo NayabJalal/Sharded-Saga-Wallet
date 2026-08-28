@@ -1,6 +1,8 @@
 package com.example.ShardedSagaWallet.Service;
 
 import com.example.ShardedSagaWallet.entities.Wallet;
+import com.example.ShardedSagaWallet.exception.ConcurrentTransactionException;
+import com.example.ShardedSagaWallet.exception.WalletNotFoundException;
 import com.example.ShardedSagaWallet.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +38,7 @@ public class WalletService {
 
     public Wallet getWalletById(Long walletId) {
         return walletRepository.findById(walletId)
-                .orElseThrow(() -> new RuntimeException("Wallet not found with id: " + walletId));
+                .orElseThrow(() -> new WalletNotFoundException(walletId));
     }
 
     public List<Wallet> getWalletsByUserId(Long userId) {
@@ -46,7 +48,7 @@ public class WalletService {
     public Wallet getWalletByUserId(Long userId) {
         log.info("Getting wallet for user with id: {}", userId);
         return walletRepository.findFirstByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Wallet not found for user id: " + userId));
+                .orElseThrow(() -> new WalletNotFoundException(userId));
     }
 
     @Transactional
@@ -87,12 +89,12 @@ public class WalletService {
         try {
             boolean isAcquired = lock.tryLock(5, 10, TimeUnit.SECONDS);
             if (!isAcquired) {
-                throw new IllegalStateException("Could not acquire lock for key: " + lockKey + ". Transaction currently processing.");
+                throw new ConcurrentTransactionException(lockKey);
             }
             return action.get();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Lock acquisition interrupted for key: " + lockKey, e);
+            throw new ConcurrentTransactionException(lockKey, e);
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();

@@ -22,14 +22,9 @@ public class WalletController {
     private final WalletService walletService;
 
     @PostMapping
-    public ResponseEntity<Wallet> createWallet(@RequestBody CreateWalletRequestDTO request){
-        try {
-            Wallet newWallet = walletService.createWallet(request.getUserId());
-            return ResponseEntity.status(HttpStatus.CREATED).body(newWallet);
-        }catch (Exception e){
-            log.error("Error creating wallet for user {}: {}", request.getUserId(), e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public ResponseEntity<Wallet> createWallet(@RequestBody CreateWalletRequestDTO request) {
+        Wallet wallet = walletService.createWallet(request.getUserId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(wallet);
     }
 
     @GetMapping("/{id}")
